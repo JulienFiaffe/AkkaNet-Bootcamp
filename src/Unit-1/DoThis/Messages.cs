@@ -46,6 +46,14 @@
         {
             public NullInputError(string reason) : base(reason) { }
         }
+
+        /// <summary>
+        /// User provided invalid input (currently, input w/ odd # chars)
+        /// </summary>
+        public class ValidationError : InputError
+        {
+            public ValidationError(string reason) : base(reason) { }
+        }
         #endregion
     }
 }
