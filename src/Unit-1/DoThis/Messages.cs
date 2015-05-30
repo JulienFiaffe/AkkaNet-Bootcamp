@@ -38,6 +38,14 @@
 
             public string Reason { get; private set; }
         }
+
+        /// <summary>
+        /// User provided blank input.
+        /// </summary>
+        public class NullInputError : InputError
+        {
+            public NullInputError(string reason) : base(reason) { }
+        }
         #endregion
     }
 }
