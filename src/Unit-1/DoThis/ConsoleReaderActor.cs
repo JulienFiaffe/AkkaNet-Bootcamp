@@ -28,13 +28,11 @@ namespace WinTail
             GetAndValidateInput();
         }
 
-
         #region Internal methods
         private void DoPrintInstructions()
         {
             Console.WriteLine("Please provide the URI of a log file on disk.\n");
         }
-
 
         /// <summary>
         /// Reads input from console, validates it, then signals appropriate response
