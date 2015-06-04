@@ -110,5 +110,17 @@ namespace WinTail
                 _reporterActor.Tell(ir.Text);
             }
         }
+
+        /// <summary>
+        /// Cleanup OS handles for <see cref="_fileStreamReader"/> and <see cref="FileObserver"/>.
+        /// </summary>
+        protected override void PostStop()
+        {
+            _observer.Dispose();
+            _observer = null;
+            _fileStreamReader.Close();
+            _fileStreamReader.Dispose();
+            base.PostStop();
+        }
     }
 }
