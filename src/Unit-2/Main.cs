@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Windows.Forms;
 using Akka.Actor;
-using Akka.Util.Internal;
 using ChartApp.Actors;
 
 namespace ChartApp
@@ -10,7 +9,6 @@ namespace ChartApp
     public partial class Main : Form
     {
         private IActorRef _chartActor;
-        private readonly AtomicCounter _seriesCounter = new AtomicCounter(1);
         private IActorRef _coordinatorActor;
         private Dictionary<CounterType, IActorRef> _toggleActors = new Dictionary<CounterType, IActorRef>();
 
