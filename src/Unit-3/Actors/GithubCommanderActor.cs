@@ -48,30 +48,65 @@ namespace GithubActors.Actors
         private IActorRef _canAcceptJobSender;
 
         public IStash Stash { get; set; }
-        
+
+        private int pendingJobReplies;
+
         public GithubCommanderActor()
+        {
+            Ready();
+        }
+
+        private void Ready()
         {
             Receive<CanAcceptJob>(job =>
             {
-                _canAcceptJobSender = Sender;
                 _coordinator.Tell(job);
+
+                BecomeAsking();
             });
+        }
+
+        private void BecomeAsking()
+        {
+            _canAcceptJobSender = Sender;
+            pendingJobReplies = 3; //the number of routees
+            Become(Asking);
+        }
+
+        private void Asking()
+        {
+            // stash any subsequent requests
+            Receive<CanAcceptJob>(job => Stash.Stash());
 
             Receive<UnableToAcceptJob>(job =>
             {
-                _canAcceptJobSender.Tell(job);
+                pendingJobReplies--;
+                if (pendingJobReplies == 0)
+                {
+                    _canAcceptJobSender.Tell(job);
+                    BecomeReady();
+                }
             });
 
             Receive<AbleToAcceptJob>(job =>
             {
                 _canAcceptJobSender.Tell(job);
 
-                //start processing messages
-                _coordinator.Tell(new GithubCoordinatorActor.BeginJob(job.Repo));
+                // start processing messages
+                Sender.Tell(new GithubCoordinatorActor.BeginJob(job.Repo));
 
-                //launch the new window to view results of the processing
-                Context.ActorSelection(ActorPaths.MainFormActor.Path).Tell(new MainFormActor.LaunchRepoResultsWindow(job.Repo, Sender));
+                // launch the new window to view results of the processing
+                Context.ActorSelection(ActorPaths.MainFormActor.Path).Tell(
+                    new MainFormActor.LaunchRepoResultsWindow(job.Repo, Sender));
+
+                BecomeReady();
             });
+        }
+
+        private void BecomeReady()
+        {
+            Become(Ready);
+            Stash.UnstashAll();
         }
 
         protected override void PreStart()
