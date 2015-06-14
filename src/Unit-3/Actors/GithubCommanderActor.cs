@@ -50,6 +50,7 @@ namespace GithubActors.Actors
         public IStash Stash { get; set; }
 
         private int pendingJobReplies;
+        private RepoKey _repoJob;
 
         public GithubCommanderActor()
         {
@@ -61,7 +62,7 @@ namespace GithubActors.Actors
             Receive<CanAcceptJob>(job =>
             {
                 _coordinator.Tell(job);
-
+                _repoJob = job.Repo;
                 BecomeAsking();
             });
         }
